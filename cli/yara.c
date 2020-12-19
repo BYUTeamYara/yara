@@ -1377,154 +1377,132 @@ int main(
 
     result = yr_compiler_get_rules(compiler, &rules);
 
-    //this next block of code 
-
-    YR_RULE* myRule;
-
-    yr_rules_foreach(rules, myRule)
-    {
-      YR_STRING* string;
-
-       yr_rule_strings_foreach(myRule, string)
-      {
-
-        //calls simplegrep command
-        char commandStr[1024] = "./simplegrep ";
-        strcat(commandStr, string->string);
-        strcat(commandStr, " ");
-        strcat(commandStr, argv[1]);
-        
-        system(commandStr);
-      }
-    }
-
     yr_compiler_destroy(compiler);
 
     compiler = NULL;
   }
 
-  // if (result != ERROR_SUCCESS)
-  // {
-  //   print_error(result);
-  //   exit_with_code(EXIT_FAILURE);
-  // }
+  if (result != ERROR_SUCCESS)
+  {
+    print_error(result);
+    exit_with_code(EXIT_FAILURE);
+  }
 
-  // if (show_stats)
-  //   print_rules_stats(rules);
+  if (show_stats)
+    print_rules_stats(rules);
 
-  // mutex_init(&output_mutex);
+  mutex_init(&output_mutex);
 
-  // if (fast_scan)
-  //   flags |= SCAN_FLAGS_FAST_MODE;
+  if (fast_scan)
+    flags |= SCAN_FLAGS_FAST_MODE;
 
-  // arg_is_dir = is_directory(argv[argc - 1]);
+  arg_is_dir = is_directory(argv[argc - 1]);
 
-  // if (scan_list_search && arg_is_dir)
-  // {
-  //   fprintf(stderr, "error: cannot use a directory as scan list.\n");
-  //   exit_with_code(EXIT_FAILURE);
-  // }
-  // else if (scan_list_search || arg_is_dir)
-  // {
-  //   if (file_queue_init() != 0)
-  //   {
-  //     print_error(ERROR_INTERNAL_FATAL_ERROR);
-  //     exit_with_code(EXIT_FAILURE);
-  //   }
+  if (scan_list_search && arg_is_dir)
+  {
+    fprintf(stderr, "error: cannot use a directory as scan list.\n");
+    exit_with_code(EXIT_FAILURE);
+  }
+  else if (scan_list_search || arg_is_dir)
+  {
+    if (file_queue_init() != 0)
+    {
+      print_error(ERROR_INTERNAL_FATAL_ERROR);
+      exit_with_code(EXIT_FAILURE);
+    }
 
-  //   THREAD thread[YR_MAX_THREADS];
-  //   THREAD_ARGS thread_args[YR_MAX_THREADS];
+    THREAD thread[YR_MAX_THREADS];
+    THREAD_ARGS thread_args[YR_MAX_THREADS];
 
-  //   time_t start_time = time(NULL);
+    time_t start_time = time(NULL);
 
-  //   for (i = 0; i < threads; i++)
-  //   {
-  //     thread_args[i].start_time = start_time;
-  //     thread_args[i].current_count = 0;
+    for (i = 0; i < threads; i++)
+    {
+      thread_args[i].start_time = start_time;
+      thread_args[i].current_count = 0;
 
-  //     result = yr_scanner_create(rules, &thread_args[i].scanner);
+      result = yr_scanner_create(rules, &thread_args[i].scanner);
 
-  //     if (result != ERROR_SUCCESS)
-  //     {
-  //       print_error(result);
-  //       exit_with_code(EXIT_FAILURE);
-  //     }
+      if (result != ERROR_SUCCESS)
+      {
+        print_error(result);
+        exit_with_code(EXIT_FAILURE);
+      }
 
-  //     yr_scanner_set_callback(
-  //         thread_args[i].scanner,
-  //         callback,
-  //         &thread_args[i].callback_args);
+      yr_scanner_set_callback(
+          thread_args[i].scanner,
+          callback,
+          &thread_args[i].callback_args);
 
-  //     yr_scanner_set_flags(thread_args[i].scanner, flags);
+      yr_scanner_set_flags(thread_args[i].scanner, flags);
 
-  //     if (create_thread(&thread[i], scanning_thread, (void*) &thread_args[i]))
-  //     {
-  //       print_error(ERROR_COULD_NOT_CREATE_THREAD);
-  //       exit_with_code(EXIT_FAILURE);
-  //     }
-  //   }
+      if (create_thread(&thread[i], scanning_thread, (void*) &thread_args[i]))
+      {
+        print_error(ERROR_COULD_NOT_CREATE_THREAD);
+        exit_with_code(EXIT_FAILURE);
+      }
+    }
 
-  //   if (arg_is_dir)
-  //   {
-  //     scan_dir(argv[argc - 1], &scan_opts, start_time);
-  //   }
-  //   else
-  //   {
-  //     result = populate_scan_list(argv[argc - 1], &scan_opts, start_time);
+    if (arg_is_dir)
+    {
+      scan_dir(argv[argc - 1], &scan_opts, start_time);
+    }
+    else
+    {
+      result = populate_scan_list(argv[argc - 1], &scan_opts, start_time);
 
-  //     if (result != ERROR_SUCCESS)
-  //       exit_with_code(EXIT_FAILURE);
-  //   }
+      if (result != ERROR_SUCCESS)
+        exit_with_code(EXIT_FAILURE);
+    }
 
-  //   file_queue_finish();
+    file_queue_finish();
 
-  //   // Wait for scan threads to finish
-  //   for (i = 0; i < threads; i++)
-  //     thread_join(&thread[i]);
+    // Wait for scan threads to finish
+    for (i = 0; i < threads; i++)
+      thread_join(&thread[i]);
 
-  //   for (i = 0; i < threads; i++)
-  //     yr_scanner_destroy(thread_args[i].scanner);
+    for (i = 0; i < threads; i++)
+      yr_scanner_destroy(thread_args[i].scanner);
 
-  //   file_queue_destroy();
-  // }
-  // else
-  // {
-  //   CALLBACK_ARGS user_data = { argv[argc - 1], 0 };
+    file_queue_destroy();
+  }
+  else
+  {
+    CALLBACK_ARGS user_data = { argv[argc - 1], 0 };
 
-  //   result = yr_scanner_create(rules, &scanner);
+    result = yr_scanner_create(rules, &scanner);
 
-  //   if (result != ERROR_SUCCESS)
-  //   {
-  //     fprintf(stderr, "error: %d\n", result);
-  //     exit_with_code(EXIT_FAILURE);
-  //   }
+    if (result != ERROR_SUCCESS)
+    {
+      fprintf(stderr, "error: %d\n", result);
+      exit_with_code(EXIT_FAILURE);
+    }
 
-  //   yr_scanner_set_callback(scanner, callback, &user_data);
-  //   yr_scanner_set_flags(scanner, flags);
-  //   yr_scanner_set_timeout(scanner, timeout);
+    yr_scanner_set_callback(scanner, callback, &user_data);
+    yr_scanner_set_flags(scanner, flags);
+    yr_scanner_set_timeout(scanner, timeout);
 
-  //   if (is_integer(argv[argc - 1]))
-  //     result = yr_scanner_scan_proc(scanner, atoi(argv[argc - 1]));
-  //   else {
-  //     result = yr_scanner_scan_file(scanner, argv[argc - 1]);
-  //     //printf(argv[argc-1]);
-  //   }
-  //   if (result != ERROR_SUCCESS)
-  //   {
-  //     fprintf(stderr, "error scanning %s: ", argv[argc - 1]);
-  //     print_scanner_error(scanner, result);
-  //     exit_with_code(EXIT_FAILURE);
-  //   }
+    if (is_integer(argv[argc - 1]))
+      result = yr_scanner_scan_proc(scanner, atoi(argv[argc - 1]));
+    else
+      result = yr_scanner_scan_file(scanner, argv[argc - 1]);
 
-  //   if (print_count_only)
-  //     printf("%d\n", user_data.current_count);
+    if (result != ERROR_SUCCESS)
+    {
+      fprintf(stderr, "error scanning %s: ", argv[argc - 1]);
+      print_scanner_error(scanner, result);
+      exit_with_code(EXIT_FAILURE);
+    }
 
-  //   #ifdef YR_PROFILING_ENABLED
-  //   yr_scanner_print_profiling_info(scanner);
-  //   #endif
-  // }
+    if (print_count_only)
+      printf("%d\n", user_data.current_count);
 
-  // result = EXIT_SUCCESS;
+    #ifdef YR_PROFILING_ENABLED
+    yr_scanner_print_profiling_info(scanner);
+    #endif
+  }
+
+  result = EXIT_SUCCESS;
 
 _exit:
 
