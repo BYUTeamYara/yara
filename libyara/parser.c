@@ -477,6 +477,8 @@ static int _yr_parser_write_string(
 
     string->length = (uint32_t) literal_string->length;
     string->string = (uint8_t*) yr_arena_ref_to_ptr(compiler->arena, &ref);
+    //I think that this is a place where the individual strings are put into the compiler. I do not know the path to get here.
+    printf("This is a string from the rule: %s\n", string->string);
 
     if (result == ERROR_SUCCESS)
     {

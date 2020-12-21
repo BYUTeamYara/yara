@@ -1507,6 +1507,9 @@ int yr_atoms_extract_from_string(
     item->atom.mask[i] = 0xFF;
   }
 
+  //Here are the tokens that are extracted. I still need to understand how the mask works, but it does show the four characters that we expected.
+  printf("This is the token that is extracted: %s\n", item->atom.bytes);
+
   max_quality = config->get_atom_quality(config, &item->atom);
 
   atom.length = YR_MAX_ATOM_LENGTH;
