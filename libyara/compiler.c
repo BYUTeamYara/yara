@@ -281,9 +281,11 @@ YR_API int yr_compiler_create(
         YR_NUM_SECTIONS, 1048576, &new_compiler->arena);
 
   if (result == ERROR_SUCCESS)
+    printf("Run aho corasick automaton \n");
     result = yr_ac_automaton_create(
         new_compiler->arena,
         &new_compiler->automaton);
+    printf("End aho corasick automaton \n");
 
   if (result == ERROR_SUCCESS)
   {
@@ -304,6 +306,7 @@ YR_API void yr_compiler_destroy(
   yr_arena_release(compiler->arena);
 
   if (compiler->automaton != NULL)
+    printf("AO automation destroy \n");
     yr_ac_automaton_destroy(compiler->automaton);
 
   yr_hash_table_destroy(
@@ -736,10 +739,11 @@ static int _yr_compiler_compile_rules(
       NULL));
 
   // Write Aho-Corasick automaton to arena.
+  printf("run ac compile \n");
   FAIL_ON_ERROR(yr_ac_compile(
       compiler->automaton,
       compiler->arena));
-
+  printf("end ac compile \n");
   YR_ARENA_REF ref;
 
   FAIL_ON_ERROR(yr_arena_allocate_struct(

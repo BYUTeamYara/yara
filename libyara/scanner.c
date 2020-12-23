@@ -92,6 +92,7 @@ static int _yr_scanner_scan_mem_block(
       {
         if (match->backtrack <= i)
         {
+          printf("Single pattern match start \n");
           FAIL_ON_ERROR(yr_scan_verify_match(
               scanner,
               match,
@@ -99,6 +100,7 @@ static int _yr_scanner_scan_mem_block(
               block->size,
               block->base,
               i - match->backtrack));
+              printf("Single pattern match end \n");
         }
 
         match = match->next;
@@ -133,6 +135,7 @@ static int _yr_scanner_scan_mem_block(
     {
       if (match->backtrack <= i)
       {
+        printf("Single pattern match start \n");
         FAIL_ON_ERROR(yr_scan_verify_match(
             scanner,
             match,
@@ -140,6 +143,7 @@ static int _yr_scanner_scan_mem_block(
             block->size,
             block->base,
             i - match->backtrack));
+            printf("Single pattern match end \n");
       }
 
       match = match->next;

@@ -512,12 +512,14 @@ static int _yr_parser_write_string(
   if (result == ERROR_SUCCESS)
   {
     // Add the string to Aho-Corasick automaton.
+    printf("AHO -- parse string \n");
     result = yr_ac_add_string(
         compiler->automaton,
         string,
         compiler->current_string_idx,
         atom_list,
         compiler->arena);
+    printf("AHO -- parse string end \n");
   }
 
   if (modifier.flags & STRING_FLAGS_LITERAL)
