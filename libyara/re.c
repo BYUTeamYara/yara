@@ -243,6 +243,7 @@ int yr_re_parse(
     RE_AST** re_ast,
     RE_ERROR* error)
 {
+  printf("This is the regex after it has been parsed: %s\n", re_string);
   return yr_parse_re_string(re_string, re_ast, error);
 }
 

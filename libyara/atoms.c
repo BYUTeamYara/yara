@@ -1460,7 +1460,7 @@ int yr_atoms_extract_from_re(
     (*atoms)->backward_code_ref = YR_ARENA_NULL_REF;
     (*atoms)->next = NULL;
   }
-
+  printf("This is the token that is extracted: %s\n", (*atoms)->atom.bytes);
   return ERROR_SUCCESS;
 }
 
