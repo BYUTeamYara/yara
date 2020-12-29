@@ -3598,9 +3598,10 @@ int yr_lex_parse_rules_file(
   #if YYDEBUG
   yydebug = 1;
   #endif
-
   yyset_in(rules_file, yyscanner);
   yyset_extra(compiler, yyscanner);
+  //the following command is what parses the strings out. I still am not sure where it connects with the next part.
+  printf("This is where the lexer is.\n");
   yyparse(yyscanner, compiler);
   yylex_destroy(yyscanner);
 

@@ -1460,7 +1460,7 @@ int yr_atoms_extract_from_re(
     (*atoms)->backward_code_ref = YR_ARENA_NULL_REF;
     (*atoms)->next = NULL;
   }
-
+  printf("This is the token that is extracted: %s\n", (*atoms)->atom.bytes);
   return ERROR_SUCCESS;
 }
 
@@ -1506,6 +1506,9 @@ int yr_atoms_extract_from_string(
     item->atom.bytes[i] = string[i];
     item->atom.mask[i] = 0xFF;
   }
+
+  //Here are the tokens that are extracted. I still need to understand how the mask works, but it does show the four characters that we expected.
+  printf("This is the token that is extracted: %s\n", item->atom.bytes);
 
   max_quality = config->get_atom_quality(config, &item->atom);
 
