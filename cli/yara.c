@@ -1442,7 +1442,7 @@ int main(
         exit_with_code(EXIT_FAILURE);
       }
     }
-
+    
     if (arg_is_dir)
     {
       scan_dir(argv[argc - 1], &scan_opts, start_time);
@@ -1471,7 +1471,7 @@ int main(
     CALLBACK_ARGS user_data = { argv[argc - 1], 0 };
 
     result = yr_scanner_create(rules, &scanner);
-
+    //result = "Pick this";
     if (result != ERROR_SUCCESS)
     {
       fprintf(stderr, "error: %d\n", result);
@@ -1501,7 +1501,7 @@ int main(
     yr_scanner_print_profiling_info(scanner);
     #endif
   }
-
+  printf("look at 1506.  Result happens before this line\n");
   result = EXIT_SUCCESS;
 
 _exit:
@@ -1518,6 +1518,5 @@ _exit:
     yr_rules_destroy(rules);
 
   yr_finalize();
-
   return result;
 }

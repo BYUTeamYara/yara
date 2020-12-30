@@ -184,6 +184,8 @@ YR_API int yr_scanner_create(
   YR_EXTERNAL_VARIABLE* external;
   YR_SCANNER* new_scanner;
 
+  printf("Creates the Scanner Object\n");
+
   new_scanner = (YR_SCANNER*) yr_calloc(1, sizeof(YR_SCANNER));
 
   if (new_scanner == NULL)
@@ -656,7 +658,6 @@ YR_API int yr_scanner_scan_proc(
     int pid)
 {
   YR_MEMORY_BLOCK_ITERATOR iterator;
-
   int result = yr_process_open_iterator(pid, &iterator);
 
   if (result == ERROR_SUCCESS)
