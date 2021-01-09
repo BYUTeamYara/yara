@@ -87,12 +87,16 @@ static int _yr_scanner_scan_mem_block(
       // match resides.
 
       match = &rules->ac_match_pool[match_table[state] - 1];
+      
+      //This does print the match, but it creates so much output it isn't helpful other than a comment here. It does work though.
+      //printf("This is the match: %s", match->string->string);
 
       while (match != NULL)
       {
         if (match->backtrack <= i)
         {
-          printf("Single pattern match start \n");
+          //I also commented these out so that the output was more readable.
+          //printf("Single pattern match start \n");
           FAIL_ON_ERROR(yr_scan_verify_match(
               scanner,
               match,
@@ -100,7 +104,7 @@ static int _yr_scanner_scan_mem_block(
               block->size,
               block->base,
               i - match->backtrack));
-              printf("Single pattern match end \n");
+              //printf("Single pattern match end \n");
         }
 
         match = match->next;
