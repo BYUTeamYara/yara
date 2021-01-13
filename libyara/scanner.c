@@ -520,6 +520,8 @@ YR_API int yr_scanner_scan_mem_blocks(
         message = CALLBACK_MSG_RULE_NOT_MATCHING;
     }
 
+    printf("this is as close to the printing of the rule name and file name that I could get to.\n");
+
     if (message != 0 && !RULE_IS_PRIVATE(rule))
     {
       switch (scanner->callback(scanner, message, rule, scanner->user_data))
