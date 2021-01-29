@@ -1,6 +1,6 @@
-#line 2 "hex_lexer.c"
+#line 1 "hex_lexer.c"
 
-#line 4 "hex_lexer.c"
+#line 3 "hex_lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -580,8 +580,8 @@ static void yynoreturn yy_fatal_error ( const char* msg , yyscan_t yyscanner );
 	yyg->yy_hold_char = *yy_cp; \
 	*yy_cp = '\0'; \
 	yyg->yy_c_buf_p = yy_cp;
-#define YY_NUM_RULES 18
-#define YY_END_OF_BUFFER 19
+#define YY_NUM_RULES 19
+#define YY_END_OF_BUFFER 20
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -591,10 +591,10 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[34] =
     {   0,
-        0,    0,    0,    0,    0,    0,   19,   17,   15,   15,
-       16,   17,   17,   17,    5,    8,    8,   14,   13,   13,
-       10,   11,   12,    6,    9,    1,    2,    3,    4,    7,
-       11,    9,    0
+        0,    0,    0,    0,    0,    0,   20,   18,   16,   16,
+       17,   18,    5,   18,    6,    9,    9,   15,   14,   14,
+       11,   12,   13,    7,   10,    1,    2,    3,    4,    8,
+       12,   10,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -672,9 +672,10 @@ static const flex_int16_t yy_chk[55] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[19] =
+static const flex_int32_t yy_rule_can_match_eol[20] =
     {   0,
-0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,     };
+0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 
+        };
 
 /* The intent behind this definition is that it'll catch
  * any uses of REJECT which flex missed.
@@ -1143,8 +1144,8 @@ YY_RULE_SETUP
 #line 124 "hex_lexer.l"
 {
 
-  BEGIN(range);
-  return yytext[0];
+  yyerror(yyscanner, lex_env, "uneven number of digits in hex string");
+  yyterminate();
 }
 	YY_BREAK
 case 6:
@@ -1152,43 +1153,43 @@ YY_RULE_SETUP
 #line 130 "hex_lexer.l"
 {
 
-  BEGIN(comment);
+  BEGIN(range);
+  return yytext[0];
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 135 "hex_lexer.l"
+#line 136 "hex_lexer.l"
+{
+
+  BEGIN(comment);
+}
+	YY_BREAK
+case 8:
+YY_RULE_SETUP
+#line 141 "hex_lexer.l"
 {
 
   BEGIN(INITIAL);
 }
 	YY_BREAK
-case 8:
-/* rule 8 can match eol */
-YY_RULE_SETUP
-#line 140 "hex_lexer.l"
-// skip comments
-	YY_BREAK
 case 9:
+/* rule 9 can match eol */
 YY_RULE_SETUP
-#line 142 "hex_lexer.l"
-// skip single-line comments
+#line 146 "hex_lexer.l"
+// skip comments
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 144 "hex_lexer.l"
-{
-
-  return yytext[0];
-}
+#line 148 "hex_lexer.l"
+// skip single-line comments
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 149 "hex_lexer.l"
+#line 150 "hex_lexer.l"
 {
 
-  yylval->integer = atoi(yytext);
-  return _NUMBER_;
+  return yytext[0];
 }
 	YY_BREAK
 case 12:
@@ -1196,54 +1197,63 @@ YY_RULE_SETUP
 #line 155 "hex_lexer.l"
 {
 
+  yylval->integer = atoi(yytext);
+  return _NUMBER_;
+}
+	YY_BREAK
+case 13:
+YY_RULE_SETUP
+#line 161 "hex_lexer.l"
+{
+
   BEGIN(INITIAL);
   return yytext[0];
 }
 	YY_BREAK
-case 13:
-/* rule 13 can match eol */
+case 14:
+/* rule 14 can match eol */
 YY_RULE_SETUP
-#line 161 "hex_lexer.l"
+#line 167 "hex_lexer.l"
 // skip whitespaces
 	YY_BREAK
-case 14:
+case 15:
 YY_RULE_SETUP
-#line 163 "hex_lexer.l"
+#line 169 "hex_lexer.l"
 {
 
   yyerror(yyscanner, lex_env, "invalid character in hex string jump");
   yyterminate();
 }
 	YY_BREAK
-case 15:
-/* rule 15 can match eol */
+case 16:
+/* rule 16 can match eol */
 YY_RULE_SETUP
-#line 169 "hex_lexer.l"
+#line 175 "hex_lexer.l"
 // skip whitespaces
 	YY_BREAK
-case 16:
+case 17:
 YY_RULE_SETUP
-#line 171 "hex_lexer.l"
+#line 177 "hex_lexer.l"
 {        // pass valid characters to the parser
 
   return yytext[0];
 }
 	YY_BREAK
-case 17:
+case 18:
 YY_RULE_SETUP
-#line 176 "hex_lexer.l"
+#line 182 "hex_lexer.l"
 {               // reject all other characters
 
   yyerror(yyscanner, lex_env, "invalid character in hex string");
   yyterminate();
 }
 	YY_BREAK
-case 18:
+case 19:
 YY_RULE_SETUP
-#line 182 "hex_lexer.l"
+#line 188 "hex_lexer.l"
 ECHO;
 	YY_BREAK
-#line 1247 "hex_lexer.c"
+#line 1256 "hex_lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
 case YY_STATE_EOF(range):
@@ -2396,8 +2406,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 182 "hex_lexer.l"
-
+#line 188 "hex_lexer.l"
 
 //
 // yyfatal (actually named hex_yyfatal because of the '%option prefix="hex_yy"'
