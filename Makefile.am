@@ -1,4 +1,4 @@
-AM_CFLAGS=-Wall -I$(srcdir)/libyara/include
+AM_CFLAGS=-Wall -I$(srcdir)/libyara/include -I/usr/include/hs -lhs
 
 if DEBUG
 AM_CFLAGS+=-g

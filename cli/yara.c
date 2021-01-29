@@ -52,8 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <ctype.h>
 
-#include <../hyperscan/src/hs.h>
 #include <yara.h>
+#include <hs.h>
+#include <hs_common.h>
 
 #include "args.h"
 #include "common.h"
@@ -1238,16 +1239,13 @@ static void unload_modules_data()
   modules_data_list = NULL;
 }
 
-static int eventHandler(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void *ctx) {
-    printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
-    return 0;
-}
-
 
 int main(
     int argc,
     const char** argv)
 {
+  printf("%s\n", hs_version());
+	
   COMPILER_RESULTS cr;
 
   YR_COMPILER* compiler = NULL;
@@ -1382,32 +1380,6 @@ int main(
       exit_with_code(EXIT_FAILURE);
 
     result = yr_compiler_get_rules(compiler, &rules);
-
-    YR_RULE* myRule;
-
-    yr_rules_foreach(rules, myRule)
-    {
-      char inputData[] = "this is a testString";
-
-      hs_database_t *database;
-      hs_compile_error_t *compile_err;
-      hs_compile(myRule->strings->string, HS_FLAG_DOTALL, HS_MODE_BLOCK, NULL, &database, &compile_err);
-
-      hs_scratch_t *scratch = NULL;
-      if (hs_alloc_scratch(database, &scratch) != HS_SUCCESS) {
-        fprintf(stderr, "ERROR: Unable to allocate scratch space. Exiting.\n");
-        free(inputData);
-        hs_free_database(database);
-        return -1;
-      }
-      if (hs_scan(database, inputData, strlen(inputData), 0, scratch, eventHandler, myRule->strings->string) != HS_SUCCESS) {
-        fprintf(stderr, "ERROR: Unable to scan input buffer. Exiting.\n");
-        hs_free_scratch(scratch);
-        free(inputData);
-        hs_free_database(database);
-        return -1;
-      }
-    }
 
     yr_compiler_destroy(compiler);
 
