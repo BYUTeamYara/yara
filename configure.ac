@@ -121,6 +121,17 @@ AC_ARG_ENABLE([profiling],
     CFLAGS="$CFLAGS -DYR_PROFILING_ENABLED"
   fi])
 
+AC_ARG_ENABLE([hyperscan],
+  [AS_HELP_STRING([--enable-hyperscan], [enable hyperscan module])],
+  [if test x$enableval = xyes; then
+    build_hyperscan_module=true
+    AC_CHECK_HEADERS([/usr/include/hs/hs.h],,
+      AC_MSG_ERROR([please install hyperscan library]))
+    AC_CHECK_LIB(hs, hs_compile,,
+      AC_MSG_ERROR([please install hyperscan library]))
+    CFLAGS="$CFLAGS -I/usr/include/hs -lhs"
+  fi])
+
 AC_ARG_ENABLE([cuckoo],
   [AS_HELP_STRING([--enable-cuckoo], [enable cuckoo module])],
   [if test x$enableval = xyes; then
@@ -318,6 +329,7 @@ AM_CONDITIONAL([POSIX], [test x$posix = xtrue])
 AM_CONDITIONAL([PROFILING_ENABLED], [test x$profiling_enabled = xtrue])
 AM_CONDITIONAL([OPTIMIZATION], [test x$optimization = xtrue])
 AM_CONDITIONAL([ADDRESS_SANITIZER], [test x$address_sanitizer = xtrue])
+AM_CONDITIONAL([HYPERSCAN_MODULE], [test x$build_hyperscan_module = xtrue])
 AM_CONDITIONAL([CUCKOO_MODULE], [test x$build_cuckoo_module = xtrue])
 AM_CONDITIONAL([MAGIC_MODULE], [test x$build_magic_module = xtrue])
 AM_CONDITIONAL([HASH_MODULE], [test x$build_hash_module = xtrue])
