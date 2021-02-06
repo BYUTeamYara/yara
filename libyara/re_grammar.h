@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.5.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,10 +31,10 @@
    version 2.2 of Bison.  */
 
 #ifndef YY_RE_YY_RE_GRAMMAR_H_INCLUDED
-#define YY_RE_YY_RE_GRAMMAR_H_INCLUDED
+# define YY_RE_YY_RE_GRAMMAR_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-#define YYDEBUG 0
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int re_yydebug;
@@ -42,58 +42,59 @@ extern int re_yydebug;
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
-#define YYTOKENTYPE
-enum yytokentype
-{
-  _CHAR_ = 258,
-  _ANY_ = 259,
-  _RANGE_ = 260,
-  _CLASS_ = 261,
-  _WORD_CHAR_ = 262,
-  _NON_WORD_CHAR_ = 263,
-  _SPACE_ = 264,
-  _NON_SPACE_ = 265,
-  _DIGIT_ = 266,
-  _NON_DIGIT_ = 267,
-  _WORD_BOUNDARY_ = 268,
-  _NON_WORD_BOUNDARY_ = 269
-};
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    _CHAR_ = 258,
+    _ANY_ = 259,
+    _RANGE_ = 260,
+    _CLASS_ = 261,
+    _WORD_CHAR_ = 262,
+    _NON_WORD_CHAR_ = 263,
+    _SPACE_ = 264,
+    _NON_SPACE_ = 265,
+    _DIGIT_ = 266,
+    _NON_DIGIT_ = 267,
+    _WORD_BOUNDARY_ = 268,
+    _NON_WORD_BOUNDARY_ = 269
+  };
 #endif
 /* Tokens.  */
-#define _CHAR_              258
-#define _ANY_               259
-#define _RANGE_             260
-#define _CLASS_             261
-#define _WORD_CHAR_         262
-#define _NON_WORD_CHAR_     263
-#define _SPACE_             264
-#define _NON_SPACE_         265
-#define _DIGIT_             266
-#define _NON_DIGIT_         267
-#define _WORD_BOUNDARY_     268
+#define _CHAR_ 258
+#define _ANY_ 259
+#define _RANGE_ 260
+#define _CLASS_ 261
+#define _WORD_CHAR_ 262
+#define _NON_WORD_CHAR_ 263
+#define _SPACE_ 264
+#define _NON_SPACE_ 265
+#define _DIGIT_ 266
+#define _NON_DIGIT_ 267
+#define _WORD_BOUNDARY_ 268
 #define _NON_WORD_BOUNDARY_ 269
 
 /* Value type.  */
-#if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 73 "re_grammar.y" /* yacc.c:1916  */
+#line 73 "re_grammar.y" /* yacc.c:1909  */
 
   int integer;
   uint32_t range;
   RE_NODE* re_node;
   RE_CLASS* re_class;
 
-#line 89 "re_grammar.h" /* yacc.c:1916  */
+#line 89 "re_grammar.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
-#define YYSTYPE_IS_TRIVIAL  1
-#define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
 
 
-int re_yyparse(void* yyscanner, RE_LEX_ENVIRONMENT* lex_env);
+
+int re_yyparse (void *yyscanner, RE_LEX_ENVIRONMENT *lex_env);
 
 #endif /* !YY_RE_YY_RE_GRAMMAR_H_INCLUDED  */
