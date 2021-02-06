@@ -108,7 +108,9 @@ Reference
 
 .. c:type:: timestamp
 
-    PE timestamp.
+    PE timestamp, as an epoch integer.
+    
+    *Example: pe.timestamp >= 1424563200*
 
 .. c:type:: pointer_to_symbol_table
 
@@ -157,9 +159,16 @@ Reference
 
 .. c:type:: entry_point
 
-    Entry point raw offset or virtual address depending on whether YARA is
+    Entry point file offset or virtual address depending on whether YARA is
     scanning a file or process memory respectively. This is equivalent to the
     deprecated ``entrypoint`` keyword.
+
+.. c:type:: entry_point_raw
+
+    Entry point raw value from the optional header of the PE. This value is not
+    converted to a file offset or an RVA.
+    
+    .. versionadded:: 4.1.0
 
 .. c:type:: base_of_code
 
@@ -572,11 +581,13 @@ Reference
 
     .. c:member:: offset
 
-        Overlay section offset.
+        Overlay section offset. This is 0 for PE files that don't have overlaid
+        data and undefined for non-PE files.
 
     .. c:member:: size
 
-        Overlay section size.
+        Overlay section size. This is 0 for PE files that don't have overlaid
+        data and undefined for non-PE files.
 
     *Example: uint8(0x0d) at pe.overlay.offset and pe.overlay.size > 1024*
 
@@ -739,7 +750,26 @@ Reference
 
     .. c:member:: algorithm
 
-        Algorithm used for this signature. Usually "sha1WithRSAEncryption".
+        String representation of the algorithm used for this
+	signature. Usually "sha1WithRSAEncryption". It depends on the
+	X.509 and PKCS#7 implementationss and possibly their versions,
+	consider using algorithm_oid instead.
+
+    .. c:member:: algorithm_oid
+
+        Object ID of the algorithm used for this signature, expressed
+        in numeric ASN.1 dot notation. The name contained in
+        algorithm is derived from this value. The object id is
+        expected to be stable across X.509 and PKCS#7 implementations
+        and their versions.
+
+	For example, when using the current OpenSSL-based implementation::
+
+	    algorithm_oid == "1.2.840.113549.1.1.11"
+
+	is functionally equivalent to::
+
+            algorithm == "sha1WithRSAEncryption"
 
     .. c:member:: serial
 
@@ -931,7 +961,13 @@ Reference
 
     .. versionadded:: 3.6.0
 
-    Number of imports in the PE.
+    Number of imported DLLs in the PE.
+
+.. c:type:: number_of_imported_functions
+
+    .. versionadded:: 4.1.0
+
+    Number of imported functions in the PE.
 
 .. c:function:: imports(dll_name, function_name)
 
