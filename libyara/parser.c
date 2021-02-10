@@ -43,6 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <yara/re.h>
 #include <yara/strutils.h>
 #include <yara/utils.h>
+#ifdef BUILD_HYPERSCAN
+  #include <yara/broken.h>
+#endif
 
 #define todigit(x) \
   ((x) >= 'A' && (x) <= 'F') ? ((uint8_t)(x - 'A' + 10)) : ((uint8_t)(x - '0'))

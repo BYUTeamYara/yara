@@ -93,6 +93,12 @@ AC_ARG_ENABLE([debug],
     debug=true
   fi])
 
+AC_ARG_ENABLE([gcov],
+  [AS_HELP_STRING([--enable-gcov], [compiles with -O0 -g -ftest-coverage -fprofile-arcs])],
+  [if test x$enableval = xyes; then
+    gcov=true
+  fi])
+
 AC_ARG_ENABLE([optimization],
   [AS_HELP_STRING([--disable-optimization], [disable compiler optimizations with -O0])],
   [if test x$enableval = xyes; then
@@ -122,6 +128,7 @@ AC_ARG_ENABLE([hyperscan],
     AC_CHECK_LIB(hs, hs_compile,,
       AC_MSG_ERROR([please install hyperscan library]))
     CFLAGS="$CFLAGS -I/usr/include/hs -lhs"
+    AC_DEFINE([BUILD_HYPERSCAN], [1],[Intel Hyperscan support enabled])
   fi])
 
 AC_ARG_ENABLE([cuckoo],
@@ -313,6 +320,7 @@ AS_IF([test "x$have_crypto" = "xno"],
 AM_CONDITIONAL([GCC], [test "x$GCC" = xyes])
 AM_CONDITIONAL([PROTOC], [test "x${PROTOC}" != "x"])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
+AM_CONDITIONAL([GCOV], [test x$gcov = xtrue])
 AM_CONDITIONAL([POSIX], [test x$posix = xtrue])
 AM_CONDITIONAL([PROFILING_ENABLED], [test x$profiling_enabled = xtrue])
 AM_CONDITIONAL([OPTIMIZATION], [test x$optimization = xtrue])
