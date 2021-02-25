@@ -39,6 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <yara/scanner.h>
 #include <yara/types.h>
 
+#ifdef BUILD_HYPERSCAN
+  #include <hs.h>
+  #include <hs_common.h>
+  bool HYPERSCAN = true;
+#endif
+
 #include "exception.h"
 
 static int _yr_scanner_scan_mem_block(
@@ -656,17 +662,38 @@ YR_API int yr_scanner_scan_mem(
 
 YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
 {
-  YR_MAPPED_FILE mfile;
-
-  int result = yr_filemap_map(filename, &mfile);
-
-  if (result == ERROR_SUCCESS)
+  if (HYPERSCAN)
   {
-    result = yr_scanner_scan_mem(scanner, mfile.data, mfile.size);
-    yr_filemap_unmap(&mfile);
-  }
+      printf("\nThis the version of our successfully implemented Hyperscan module:\n");
+      printf("%s\n\n", hs_version());
+      YR_RULE* tempRule;
+      YR_STRING* tempString;
+        yr_rules_foreach(scanner->rules, tempRule)
+        {
+          yr_rule_strings_foreach(tempRule, tempString)
+          {
+            printf("This is a string we will feed into our Hyperscan implementation to search for:\n%s\n\n", tempString->string);
+          }
+        }
 
-  return result;
+      printf("This is the file we will feed into our Hyperscan implementation to search through:\n%s\n\n", filename);
+      int result = ERROR_SUCCESS;
+      return result;
+  }
+  else
+  {
+    YR_MAPPED_FILE mfile;
+
+    int result = yr_filemap_map(filename, &mfile);
+
+    if (result == ERROR_SUCCESS)
+      {
+        result = yr_scanner_scan_mem(scanner, mfile.data, mfile.size);
+        yr_filemap_unmap(&mfile);
+      }
+
+    return result;
+  }
 }
 
 YR_API int yr_scanner_scan_fd(YR_SCANNER* scanner, YR_FILE_DESCRIPTOR fd)

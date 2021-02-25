@@ -131,6 +131,7 @@ static int _yr_scan_compare(
     uint8_t* string,
     size_t string_length)
 {
+  printf("lichess");
   const uint8_t* s1 = data;
   const uint8_t* s2 = string;
 

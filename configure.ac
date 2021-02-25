@@ -84,8 +84,6 @@ ACX_PTHREAD(
 
 AC_CHECK_LIB(m, isnan)
 AC_CHECK_LIB(m, log2)
-AS_IF([test "ac_cv_lib_m_isnan" = yes || test "$ac_cv_lib_m_log2" = yes],
-    [PC_LIBS_PRIVATE="$PC_LIBS_PRIVATE -lm"])
 AC_CHECK_FUNCS([strlcpy strlcat memmem timegm _mkgmtime clock_gettime])
 AC_CHECK_HEADERS([stdbool.h])
 
@@ -130,6 +128,7 @@ AC_ARG_ENABLE([hyperscan],
     AC_CHECK_LIB(hs, hs_compile,,
       AC_MSG_ERROR([please install hyperscan library]))
     CFLAGS="$CFLAGS -I/usr/include/hs -lhs"
+    AC_DEFINE([BUILD_HYPERSCAN], [1],[Intel Hyperscan support enabled])
   fi])
 
 AC_ARG_ENABLE([cuckoo],
@@ -200,7 +199,6 @@ AC_ARG_ENABLE([pb-tests],
     CFLAGS="$CFLAGS -DPB_TESTS_MODULE"
     PC_REQUIRES_PRIVATE="$PC_REQUIRES_PRIVATE libprotobuf-c"
   fi])
-
 AC_ARG_WITH([jemalloc],
   [AS_HELP_STRING([--with-jemalloc],
     [use jemalloc to debug heap-related issues])],
@@ -210,9 +208,7 @@ AC_ARG_WITH([jemalloc],
     AC_CHECK_LIB(jemalloc, $jemalloc_prefix$mallctl,,
       AC_MSG_ERROR([please install jemalloc library]))
     CFLAGS="$CFLAGS -DJEMALLOC -Dmallctl=$jemalloc_prefix$mallctl -Dmalloc_stats_print=$jemalloc_prefix$malloc_stats_print $no_std_allocator"
-    PC_REQUIRES_PRIVATE="$PC_REQUIRES_PRIVATE jemalloc"
   fi])
-
 AC_ARG_WITH([tcmalloc],
   [AS_HELP_STRING([--with-tcmalloc],
     [use tcmalloc as the default heap allocator])],
@@ -223,22 +219,17 @@ AC_ARG_WITH([tcmalloc],
     AC_CHECK_LIB(tcmalloc, tc_cfree,,
       AC_MSG_ERROR([please install https://github.com/gperftools/gperftools]))
     CFLAGS="$CFLAGS -DTCMALLOC $no_std_allocator"
-    PC_REQUIRES_PRIVATE="$PC_REQUIRES_PRIVATE tcmalloc"
   fi])
-
 AC_ARG_WITH([cpu-profiler],
   [AS_HELP_STRING([--with-cpu-profiler],
     [compile with CPU profiling support])],
   [if test x$withval = xyes; then
     AC_CHECK_LIB(profiler, ProfilerStart,,
       AC_MSG_ERROR([please install https://github.com/gperftools/gperftools]))
-    PC_REQUIRES_PRIVATE="$PC_REQUIRES_PRIVATE libprofiler"
   fi])
-
 AC_ARG_WITH([crypto],
   AS_HELP_STRING([--without-crypto],
     [ignore presence of OpenSSL and disable it]))
-
 AS_IF([test "x$with_crypto" != "xno"],
   [
     AC_CHECK_HEADERS([openssl/md5.h],, [have_crypto=no])
@@ -259,8 +250,6 @@ AS_IF([test "x$with_crypto" != "xno"],
   [
     have_crypto=no
   ])
-
-
 AS_IF([test "x$have_crypto" = "xno"],
   [
     AS_IF([test "x$with_crypto" = "xyes"],
@@ -269,7 +258,6 @@ AS_IF([test "x$have_crypto" = "xno"],
       ],
       [
         AC_MSG_WARN([
-
 *****************************************************************
   Could not find OpenSSL library. Some features in "pe" module
   have been disabled. If you want to enable all features please
@@ -304,7 +292,6 @@ AS_IF([test "x$have_crypto" = "xno"],
           ],
           [
             AC_MSG_WARN([
-
 *****************************************************************
   Could not find alternative APIs for hash functions. The "hash"
   module has been disabled.
@@ -318,9 +305,6 @@ AS_IF([test "x$have_crypto" = "xno"],
     CFLAGS="$CFLAGS -DHASH_MODULE"
     PC_REQUIRES_PRIVATE="$PC_REQUIRES_PRIVATE libcrypto"
   ])
-
-
-
 AM_CONDITIONAL([GCC], [test "x$GCC" = xyes])
 AM_CONDITIONAL([PROTOC], [test "x${PROTOC}" != "x"])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
@@ -338,7 +322,6 @@ AM_CONDITIONAL([MACHO_MODULE], [test x$build_macho_module = xtrue])
 AM_CONDITIONAL([PB_TESTS_MODULE], [test x$build_pb_tests_module = xtrue])
 AM_CONDITIONAL([DEX_MODULE], [test x$build_dex_module = xtrue])
 AM_CONDITIONAL([DEBUG_DEX_MODULE], [test x$debug_dex_module = xtrue])
-
 AM_CONDITIONAL([USE_WINDOWS_PROC], [test x$proc_interface = xwindows ])
 AM_CONDITIONAL([USE_LINUX_PROC], [test x$proc_interface = xlinux ])
 AM_CONDITIONAL([USE_FREEBSD_PROC], [test x$proc_interface = xfreebsd ])
@@ -348,12 +331,9 @@ AM_CONDITIONAL([USE_NO_PROC], [test x$proc_interface = xnone ])
 AS_IF(
   [test x$proc_interface != xnone],[AC_DEFINE([HAVE_SCAN_PROC_IMPL],[1])],
   [test x$proc_interface = xnone],[AC_DEFINE([HAVE_SCAN_PROC_IMPL],[0])])
-
 AC_SUBST([PC_REQUIRES_PRIVATE])
 AC_SUBST([PC_LIBS_PRIVATE])
-
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libyara/Makefile])
 AC_CONFIG_FILES([libyara/yara.pc])
-
 AC_OUTPUT

@@ -484,7 +484,7 @@ static int _yr_parser_write_string(
         compiler->current_string_idx,
         atom_list,
         compiler->arena);
-  }
+    }
 
   if (modifier.flags & STRING_FLAGS_LITERAL)
   {
