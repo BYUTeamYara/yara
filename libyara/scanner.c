@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef BUILD_HYPERSCAN
   #include <hs.h>
   #include <hs_common.h>
+  #include <hs_mpm.c>
   bool HYPERSCAN = true;
 #endif
 
@@ -673,10 +674,14 @@ YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
           yr_rule_strings_foreach(tempRule, tempString)
           {
             printf("This is a string we will feed into our Hyperscan implementation to search for:\n%s\n\n", tempString->string);
+            hs_mpm(tempString->string, filename);
           }
         }
 
       printf("This is the file we will feed into our Hyperscan implementation to search through:\n%s\n\n", filename);
+
+      
+
       int result = ERROR_SUCCESS;
       return result;
   }
