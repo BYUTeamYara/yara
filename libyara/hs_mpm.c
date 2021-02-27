@@ -17,6 +17,12 @@
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
     printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
+    YR_MATCH* new_match;
+    new_match->base = from;
+    new_match->offset = to;
+    new_match->match_length = strlen((char *)ctx);
+
+
     return 0;
 }
 
@@ -95,8 +101,7 @@ static char *readInputData(const char *inputFN, unsigned int *length) {
 
 void hs_mpm(const char* regex, char* file)
 { 
-    //Compile the database from regex
-    printf("alpha");	
+    //Compile the database from regex	
     hs_database_t *database;
     hs_compile_error_t *compile_err;
     if (hs_compile(regex, HS_FLAG_DOTALL, HS_MODE_BLOCK, NULL, &database,
@@ -107,7 +112,6 @@ void hs_mpm(const char* regex, char* file)
         return -1;
     }
 /* Next, we read the input data file into a buffer. */
-    printf("bravo");
     unsigned int length;
     char *inputData = readInputData(file, &length);
     if (!inputData) {
@@ -116,7 +120,6 @@ void hs_mpm(const char* regex, char* file)
     }
     
     //allocate scratch space
-    printf("charlie");
     hs_scratch_t *scratch = NULL;
     if (hs_alloc_scratch(database, &scratch) != HS_SUCCESS) {
         fprintf(stderr, "ERROR: Unable to allocate scratch space. Exiting.\n");
