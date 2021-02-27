@@ -38,14 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <yara/proc.h>
 #include <yara/scanner.h>
 #include <yara/types.h>
-
+#include <hs.h>
+#include <hs_common.h>
+#include <hs_mpm.c>
+bool HYPERSCAN = true;
+/*
 #ifdef BUILD_HYPERSCAN
   #include <hs.h>
   #include <hs_common.h>
   #include <hs_mpm.c>
   bool HYPERSCAN = true;
 #endif
-
+*/
 #include "exception.h"
 
 static int _yr_scanner_scan_mem_block(
