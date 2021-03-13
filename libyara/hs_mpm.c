@@ -5,8 +5,11 @@
 #include <string.h>
 
 #include <hs.h>
+#include <yara/scan.h>
 
-
+typedef struct testObject { YR_SCANNER* scanner; char* regex_match; } testObject; 
+//YR_SCANNER* global_scanner;
+//typedef unsigned long long uint64; 
 /**
  * This is the function that will be called for each match that occurs. @a ctx
  * is to allow you to have some application-specific state that you will get
@@ -16,11 +19,33 @@
 
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
-    printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
-    YR_MATCH* new_match;
-    new_match->base = from;
-    new_match->offset = to;
-    new_match->match_length = strlen((char *)ctx);
+    //printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
+    testObject *context = (testObject *)ctx;
+    //char *regex = context->regex_match;
+    printf("$%s$", context->regex_match);
+    
+    // YR_SCANNER* scanner = ctx;
+    // YR_RULE* tempRule;
+    // YR_STRING* tempString;
+    // yr_rules_foreach(scanner->rules, tempRule)
+    //     {
+    //       yr_rule_strings_foreach(tempRule, tempString)
+    //       {
+    //         printf("\n**%s**\n", tempString->string);
+    //         printf("%i", flags);
+    //       }
+    //     }
+
+    //uint64_t myBase = (uint64_t) from;
+    //const uint64_t test = 0;
+
+    //YR_MATCH* new_match;
+    //new_match->base = myBase;
+    //new_match->offset = to;
+    //new_match->match_length = strlen((char *)ctx);
+    //new_match->data = (char*)ctx;
+
+    //_yr_scan_add_match_to_list(*new_match, &global_scanner->matches, false);
 
 
     return 0;
@@ -99,9 +124,14 @@ static char *readInputData(const char *inputFN, unsigned int *length) {
     
 
 
-void hs_mpm(const char* regex, char* file)
+void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
 { 
-    //Compile the database from regex	
+    //Compile the database from regex
+    
+    struct testObject *context=malloc(sizeof(struct testObject));
+    context->scanner = scanner;
+    context->regex_match = regex;
+
     hs_database_t *database;
     hs_compile_error_t *compile_err;
     if (hs_compile(regex, HS_FLAG_DOTALL, HS_MODE_BLOCK, NULL, &database,
@@ -131,8 +161,9 @@ void hs_mpm(const char* regex, char* file)
     printf("Scanning %u bytes with Hyperscan\n", length);
     
     //Scan the input using the database
-    if (hs_scan(database, inputData, length, 0, scratch, eventHandler,
-                regex) != HS_SUCCESS) {
+    
+    if (hs_scan(database, inputData, length, 0, scratch, eventHandler, &context) != HS_SUCCESS) {
+    //pass in pointer to pointer for scanner within hs_scan()
         fprintf(stderr, "ERROR: Unable to scan input buffer. Exiting.\n");
         hs_free_scratch(scratch);
         free(inputData);
