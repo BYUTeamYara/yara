@@ -7,7 +7,7 @@
 #include <hs.h>
 #include <yara/scan.h>
 
-typedef struct testObject { YR_SCANNER* scanner; char* regex_match; } testObject; 
+typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; } YR_HS_SCAN_CONTEXT; 
 //YR_SCANNER* global_scanner;
 //typedef unsigned long long uint64; 
 /**
@@ -20,9 +20,18 @@ typedef struct testObject { YR_SCANNER* scanner; char* regex_match; } testObject
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
     //printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
-    testObject *context = (testObject *)ctx;
+    YR_HS_SCAN_CONTEXT * context = (YR_HS_SCAN_CONTEXT *)ctx;
+    YARA_SCANNER* scanner = context->scanner;
+    char* new_match = context->regex_match;
     //char *regex = context->regex_match;
-    printf("$%s$", context->regex_match);
+    // YR_MATCH* new_match;
+    // new_match->base = myBase;
+    // new_match->offset = to;
+    // new_match->match_length = strlen((char *)ctx);
+    // new_match->data = (char*)ctx;
+
+    printf("$%s$\n", context->regex_match);
+
     
     // YR_SCANNER* scanner = ctx;
     // YR_RULE* tempRule;
@@ -39,13 +48,7 @@ static int eventHandler(unsigned int id, unsigned long long from,
     //uint64_t myBase = (uint64_t) from;
     //const uint64_t test = 0;
 
-    //YR_MATCH* new_match;
-    //new_match->base = myBase;
-    //new_match->offset = to;
-    //new_match->match_length = strlen((char *)ctx);
-    //new_match->data = (char*)ctx;
-
-    //_yr_scan_add_match_to_list(*new_match, &global_scanner->matches, false);
+    _yr_scan_add_match_to_list(*new_match, ->matches, false);
 
 
     return 0;
@@ -128,7 +131,7 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
 { 
     //Compile the database from regex
     
-    struct testObject *context=malloc(sizeof(struct testObject));
+    struct YR_HS_SCAN_CONTEXT *context=malloc(sizeof(struct YR_HS_SCAN_CONTEXT));
     context->scanner = scanner;
     context->regex_match = regex;
 
@@ -162,7 +165,7 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
     
     //Scan the input using the database
     
-    if (hs_scan(database, inputData, length, 0, scratch, eventHandler, &context) != HS_SUCCESS) {
+    if (hs_scan(database, inputData, length, 0, scratch, eventHandler, context) != HS_SUCCESS) {
     //pass in pointer to pointer for scanner within hs_scan()
         fprintf(stderr, "ERROR: Unable to scan input buffer. Exiting.\n");
         hs_free_scratch(scratch);
