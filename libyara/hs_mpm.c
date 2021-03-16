@@ -4,8 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hs.h>
+#include <assert.h>
+#include <ctype.h>
+#include <yara/error.h>
+#include <yara/globals.h>
+#include <yara/libyara.h>
+#include <yara/limits.h>
+#include <yara/re.h>
+#include <yara/rules.h>
 #include <yara/scan.h>
+#include <yara/stopwatch.h>
+#include <yara/types.h>
+#include <yara/utils.h>
+
+#include <hs.h>
+
 
 typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; } YR_HS_SCAN_CONTEXT; 
 //YR_SCANNER* global_scanner;
@@ -19,16 +32,13 @@ typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; } YR
 
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
-    //printf("Match for pattern \"%s\" at offset %llu\n", (char *)ctx, to);
     YR_HS_SCAN_CONTEXT * context = (YR_HS_SCAN_CONTEXT *)ctx;
-    YARA_SCANNER* scanner = context->scanner;
-    char* new_match = context->regex_match;
-    //char *regex = context->regex_match;
-    // YR_MATCH* new_match;
-    // new_match->base = myBase;
-    // new_match->offset = to;
-    // new_match->match_length = strlen((char *)ctx);
-    // new_match->data = (char*)ctx;
+    printf("Match for pattern \"%s\" at offset %llu\n", context->regex_match, to);
+    YR_MATCH* new_match=malloc(sizeof(YR_MATCH));
+    new_match->base = from;
+    new_match->offset = to;
+    new_match->match_length = strlen(context->regex_match);
+    new_match->data = context->regex_match;
 
     printf("$%s$\n", context->regex_match);
 
@@ -47,11 +57,12 @@ static int eventHandler(unsigned int id, unsigned long long from,
 
     //uint64_t myBase = (uint64_t) from;
     //const uint64_t test = 0;
+    int result = ERROR_SUCCESS;
+    print_error(result);
 
-    _yr_scan_add_match_to_list(*new_match, ->matches, false);
+    YR_MATCHES* matches_list = malloc(sizeof(YR_MATCH));
 
-
-    return 0;
+    return _yr_scan_add_match_to_list(new_match, matches_list, false);
 }
 
 /**

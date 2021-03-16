@@ -669,23 +669,15 @@ YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
 {
   if (HYPERSCAN)
   {
-      int flag = 0;
       YR_RULE* tempRule;
       YR_STRING* tempString;
         yr_rules_foreach(scanner->rules, tempRule)
         {
           yr_rule_strings_foreach(tempRule, tempString)
           {
-            flag = flag + 1;
-            printf("This is a string we will feed into our Hyperscan implementation to search for:\n%s\n\n", tempString->string);
             hs_mpm(tempString->string, filename, scanner);
           }
-        }
-
-      printf("This is the file we will feed into our Hyperscan implementation to search through:\n%s\n\n", filename);
-
-      
-
+        }     
       int result = ERROR_SUCCESS;
       return result;
   }
