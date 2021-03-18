@@ -131,7 +131,6 @@ static int _yr_scan_compare(
     uint8_t* string,
     size_t string_length)
 {
-  printf("lichess");
   const uint8_t* s1 = data;
   const uint8_t* s2 = string;
 
@@ -274,7 +273,7 @@ static void _yr_scan_update_match_chain_length(
   }
 }
 
-static int _yr_scan_add_match_to_list(
+int _yr_scan_add_match_to_list(
     YR_MATCH* match,
     YR_MATCHES* matches_list,
     int replace_if_exists)

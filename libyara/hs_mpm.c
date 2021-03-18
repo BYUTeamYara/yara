@@ -20,7 +20,7 @@
 #include <hs.h>
 
 
-typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; } YR_HS_SCAN_CONTEXT; 
+typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; YR_RULE* rule} YR_HS_SCAN_CONTEXT; 
 //YR_SCANNER* global_scanner;
 //typedef unsigned long long uint64; 
 /**
@@ -33,36 +33,20 @@ typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; } YR
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
     YR_HS_SCAN_CONTEXT * context = (YR_HS_SCAN_CONTEXT *)ctx;
-    printf("Match for pattern \"%s\" at offset %llu\n", context->regex_match, to);
+
     YR_MATCH* new_match=malloc(sizeof(YR_MATCH));
     new_match->base = from;
     new_match->offset = to;
     new_match->match_length = strlen(context->regex_match);
     new_match->data = context->regex_match;
 
-    printf("$%s$\n", context->regex_match);
+    _yr_scan_add_match_to_list(new_match, context->scanner->matches, false);
+    context->scanner->flags = CALLBACK_MSG_RULE_MATCHING;
+    int message = CALLBACK_MSG_RULE_MATCHING;
+    context->scanner->callback(context->scanner, message, context->rule, context->scanner->user_data);
 
-    
-    // YR_SCANNER* scanner = ctx;
-    // YR_RULE* tempRule;
-    // YR_STRING* tempString;
-    // yr_rules_foreach(scanner->rules, tempRule)
-    //     {
-    //       yr_rule_strings_foreach(tempRule, tempString)
-    //       {
-    //         printf("\n**%s**\n", tempString->string);
-    //         printf("%i", flags);
-    //       }
-    //     }
-
-    //uint64_t myBase = (uint64_t) from;
-    //const uint64_t test = 0;
     int result = ERROR_SUCCESS;
-    print_error(result);
-
-    YR_MATCHES* matches_list = malloc(sizeof(YR_MATCH));
-
-    return _yr_scan_add_match_to_list(new_match, matches_list, false);
+    return 0; 
 }
 
 /**
@@ -138,13 +122,14 @@ static char *readInputData(const char *inputFN, unsigned int *length) {
     
 
 
-void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
+void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner, YR_RULE* rule)
 { 
     //Compile the database from regex
     
     struct YR_HS_SCAN_CONTEXT *context=malloc(sizeof(struct YR_HS_SCAN_CONTEXT));
     context->scanner = scanner;
     context->regex_match = regex;
+    context->rule = rule;
 
     hs_database_t *database;
     hs_compile_error_t *compile_err;
@@ -171,8 +156,6 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
         hs_free_database(database);
         return -1;
     }
-
-    printf("Scanning %u bytes with Hyperscan\n", length);
     
     //Scan the input using the database
     
@@ -184,7 +167,7 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner)
         hs_free_database(database);
         return -1;
     }
-
+        
     /* Scanning is complete, any matches have been handled, so now we just
      * clean up and exit.
      */

@@ -52,6 +52,19 @@ bool HYPERSCAN = true;
 */
 #include "exception.h"
 
+static void print_string(const uint8_t* data, int length)
+{
+  for (int i = 0; i < length; i++)
+  {
+    if (data[i] >= 32 && data[i] <= 126)
+      printf("%c", data[i]);
+    else
+      printf("\\x%02X", data[i]);
+  }
+
+  printf("\n");
+}
+
 static int _yr_scanner_scan_mem_block(
     YR_SCANNER* scanner,
     const uint8_t* block_data,
@@ -495,7 +508,6 @@ YR_API int yr_scanner_scan_mem_blocks(
 
     block = iterator->next(iterator);
   }
-
   result = iterator->last_error;
 
   if (result != ERROR_SUCCESS)
@@ -521,6 +533,7 @@ YR_API int yr_scanner_scan_mem_blocks(
     {
       if (scanner->flags & SCAN_FLAGS_REPORT_RULES_MATCHING)
         message = CALLBACK_MSG_RULE_MATCHING;
+        printf("sorry");
     }
     else
     {
@@ -545,7 +558,6 @@ YR_API int yr_scanner_scan_mem_blocks(
 
   scanner->callback(
       scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
-
 _exit:
 
   // If error is ERROR_BLOCK_NOT_READY we don't clean the matches and don't
@@ -667,6 +679,7 @@ YR_API int yr_scanner_scan_mem(
 
 YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
 {
+  //HYPERSCAN = false;
   if (HYPERSCAN)
   {
       YR_RULE* tempRule;
@@ -675,9 +688,11 @@ YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
         {
           yr_rule_strings_foreach(tempRule, tempString)
           {
-            hs_mpm(tempString->string, filename, scanner);
+            hs_mpm(tempString->string, filename, scanner, tempRule);
           }
-        }     
+        }
+      scanner->callback(scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
+
       int result = ERROR_SUCCESS;
       return result;
   }
