@@ -32,21 +32,22 @@ typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; YR_R
 
 static int eventHandler(unsigned int id, unsigned long long from,
                         unsigned long long to, unsigned int flags, void *ctx) {
+    
+    int result;
     YR_HS_SCAN_CONTEXT * context = (YR_HS_SCAN_CONTEXT *)ctx;
-
+    
     YR_MATCH* new_match=malloc(sizeof(YR_MATCH));
     new_match->base = from;
     new_match->offset = to;
     new_match->match_length = strlen(context->regex_match);
     new_match->data = context->regex_match;
-
     _yr_scan_add_match_to_list(new_match, context->scanner->matches, false);
+    
     context->scanner->flags = CALLBACK_MSG_RULE_MATCHING;
     int message = CALLBACK_MSG_RULE_MATCHING;
-    context->scanner->callback(context->scanner, message, context->rule, context->scanner->user_data);
+    result = context->scanner->callback(context->scanner, message, context->rule, context->scanner->user_data);
 
-    int result = ERROR_SUCCESS;
-    return 0; 
+    return result; 
 }
 
 /**

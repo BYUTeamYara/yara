@@ -533,7 +533,6 @@ YR_API int yr_scanner_scan_mem_blocks(
     {
       if (scanner->flags & SCAN_FLAGS_REPORT_RULES_MATCHING)
         message = CALLBACK_MSG_RULE_MATCHING;
-        printf("sorry");
     }
     else
     {
@@ -684,11 +683,19 @@ YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
   {
       YR_RULE* tempRule;
       YR_STRING* tempString;
+      YR_META* tempMeta;
         yr_rules_foreach(scanner->rules, tempRule)
         {
           yr_rule_strings_foreach(tempRule, tempString)
           {
-            hs_mpm(tempString->string, filename, scanner, tempRule);
+            if (STRING_IS_LITERAL(tempString))
+            {
+              hs_mpm(tempString->string, filename, scanner, tempRule);
+            }
+            else
+            {
+              printf("its a regex/hex\n");
+            }
           }
         }
       scanner->callback(scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
