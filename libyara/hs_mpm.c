@@ -172,7 +172,7 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner, YR_RULE* rule)
     /* Scanning is complete, any matches have been handled, so now we just
      * clean up and exit.
      */
-    hs_free_scratch;
+    hs_free_scratch();
     free(inputData);
     hs_free_database(database);
     return;
