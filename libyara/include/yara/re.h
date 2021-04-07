@@ -151,6 +151,10 @@ int yr_re_fast_exec(
     void* callback_args,
     int* matches);
 
+char* yr_get_re_string(int index);
+
+void yr_add_string(const char* string);
+
 int yr_re_parse(const char* re_string, RE_AST** re_ast, RE_ERROR* error);
 
 int yr_re_parse_hex(const char* hex_string, RE_AST** re_ast, RE_ERROR* error);

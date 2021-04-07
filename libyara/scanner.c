@@ -38,32 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <yara/proc.h>
 #include <yara/scanner.h>
 #include <yara/types.h>
-#include <hs.h>
-#include <hs_common.h>
-#include <hs_mpm.c>
-bool HYPERSCAN = true;
-/*
+
 #ifdef BUILD_HYPERSCAN
   #include <hs.h>
   #include <hs_common.h>
   #include <hs_mpm.c>
+  #include <yara/re.h>
   bool HYPERSCAN = true;
 #endif
-*/
+
 #include "exception.h"
-
-static void print_string(const uint8_t* data, int length)
-{
-  for (int i = 0; i < length; i++)
-  {
-    if (data[i] >= 32 && data[i] <= 126)
-      printf("%c", data[i]);
-    else
-      printf("\\x%02X", data[i]);
-  }
-
-  printf("\n");
-}
 
 static int _yr_scanner_scan_mem_block(
     YR_SCANNER* scanner,
@@ -678,12 +662,15 @@ YR_API int yr_scanner_scan_mem(
 
 YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
 {
-  //HYPERSCAN = false;
+  // Checks if global hyperscan variable is set (defined by whether or not Hyperscan is configured)/
   if (HYPERSCAN)
   {
       YR_RULE* tempRule;
       YR_STRING* tempString;
       YR_META* tempMeta;
+        
+        // Steps through every rule and calls Hyperscan scanning accordingly based on type of string.
+
         yr_rules_foreach(scanner->rules, tempRule)
         {
           yr_rule_strings_foreach(tempRule, tempString)
@@ -692,16 +679,22 @@ YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
             {
               hs_mpm(tempString->string, filename, scanner, tempRule);
             }
-            else
+            else if STRING_IS_REGEXP(tempString)
             {
-              printf("its a regex/hex\n");
+              hs_mpm(yr_get_re_string(0), filename, scanner, tempRule);
+             }
+            else if STRING_IS_HEX(tempString)
+            {
+              // Functionality not ready yet
             }
           }
         }
+      
+
       scanner->callback(scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
 
-      int result = ERROR_SUCCESS;
-      return result;
+      // Error checking not implemented yet.
+      return ERROR_SUCCESS;
   }
   else
   {

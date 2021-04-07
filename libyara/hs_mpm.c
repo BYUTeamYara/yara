@@ -21,13 +21,9 @@
 
 
 typedef struct YR_HS_SCAN_CONTEXT { YR_SCANNER* scanner; char* regex_match; YR_RULE* rule} YR_HS_SCAN_CONTEXT; 
-//YR_SCANNER* global_scanner;
-//typedef unsigned long long uint64; 
 /**
- * This is the function that will be called for each match that occurs. @a ctx
- * is to allow you to have some application-specific state that you will get
- * access to for each match. In this function  we're just going to use it
- * to pass in the pattern that was being searched for so we can print it out.
+ * This is the function that will be called for each match that occurs. Function creates a new match within the scanner object
+ * and also uses the callback to report matches.
  */
 
 static int eventHandler(unsigned int id, unsigned long long from,
@@ -121,7 +117,7 @@ static char *readInputData(const char *inputFN, unsigned int *length) {
     return inputData;
 }
     
-
+// Function uses scanner object along with other information to compile database and scan.
 
 void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner, YR_RULE* rule)
 { 
@@ -172,7 +168,7 @@ void hs_mpm(const char* regex, char* file, YR_SCANNER* scanner, YR_RULE* rule)
     /* Scanning is complete, any matches have been handled, so now we just
      * clean up and exit.
      */
-    hs_free_scratch();
+    hs_free_scratch;
     free(inputData);
     hs_free_database(database);
     return;
