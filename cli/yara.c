@@ -561,13 +561,31 @@ static void scan_dir(
 
       int err = lstat(full_path, &st);
 
+      // If lstat returned error, or this directory entry is a symlink and the
+      // user doesn't want to follow symlinks, skip the entry and continue with
+      // the next one.
       if (err != 0 || (S_ISLNK(st.st_mode) && !scan_opts->follow_symlinks))
       {
         de = readdir(dp);
         continue;
       }
+      // If the directory entry is a symlink, check if it points to . and
+      // skip it in that case.
+      else if (S_ISLNK(st.st_mode))
+      {
+        char buf[2];
+
+        int len = readlink(full_path, buf, sizeof(buf));
+
+        if (len == 1 && strcmp(buf, ".") == 0)
+        {
+          de = readdir(dp);
+          continue;
+        }
+      }
 
       err = stat(full_path, &st);
+
       if (err == 0)
       {
         if (S_ISREG(st.st_mode))
@@ -673,10 +691,10 @@ static void print_escaped(const uint8_t* data, size_t length)
 
 static void print_hex_string(const uint8_t* data, int length)
 {
-  for (int i = 0; i < min(32, length); i++)
+  for (int i = 0; i < min(64, length); i++)
     printf("%s%02X", (i == 0 ? "" : " "), data[i]);
 
-  puts(length > 32 ? " ..." : "");
+  puts(length > 64 ? " ..." : "");
 }
 
 static void print_error(int error)
@@ -774,11 +792,11 @@ static void print_compiler_error(
   {
     fprintf(
         stderr,
-        "%s(%d): %s in rule \"%s\": %s\n",
-        file_name,
-        line_number,
+        "%s: rule \"%s\" in %s(%d): %s\n",
         msg_type,
         rule->identifier,
+        file_name,
+        line_number,
         message);
   }
   else
@@ -1002,6 +1020,8 @@ static int callback(
     void* user_data)
 {
   YR_MODULE_IMPORT* mi;
+  YR_STRING* string;
+  YR_RULE* rule;
   YR_OBJECT* object;
   MODULE_DATA* module_data;
 
@@ -1044,15 +1064,27 @@ static int callback(
       mutex_unlock(&output_mutex);
     }
 
+    return CALLBACK_CONTINUE;
+
+  case CALLBACK_MSG_TOO_MANY_MATCHES:
+
+    if (ignore_warnings)
       return CALLBACK_CONTINUE;
 
-    case CALLBACK_MSG_TOO_MANY_MATCHES:
-      fprintf(
-          stderr,
-          "Warning: maximum matches for string %s. Results may be invalid.\n",
-          ((YR_STRING*) message_data)->identifier);
+    string = (YR_STRING*) message_data;
+    rule = &context->rules->rules_table[string->rule_idx];
 
-      return CALLBACK_CONTINUE;
+    fprintf(
+        stderr,
+        "warning: rule \"%s\": too many matches for %s, results for this rule "
+        "may be incorrect\n",
+        rule->identifier,
+        string->identifier);
+
+    if (fail_on_warnings)
+      return CALLBACK_ERROR;
+
+    return CALLBACK_CONTINUE;
   }
 
   return CALLBACK_ERROR;

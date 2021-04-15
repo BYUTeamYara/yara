@@ -39,6 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <yara/scanner.h>
 #include <yara/types.h>
 
+#ifdef BUILD_HYPERSCAN
+  #include <hs.h>
+  #include <hs_common.h>
+  #include <hs_mpm.c>
+  #include <yara/re.h>
+  bool HYPERSCAN = true;
+#endif
+
 #include "exception.h"
 
 static int _yr_scanner_scan_mem_block(
@@ -484,7 +492,6 @@ YR_API int yr_scanner_scan_mem_blocks(
 
     block = iterator->next(iterator);
   }
-
   result = iterator->last_error;
 
   if (result != ERROR_SUCCESS)
@@ -534,7 +541,6 @@ YR_API int yr_scanner_scan_mem_blocks(
 
   scanner->callback(
       scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
-
 _exit:
 
   // If error is ERROR_BLOCK_NOT_READY we don't clean the matches and don't
@@ -656,17 +662,54 @@ YR_API int yr_scanner_scan_mem(
 
 YR_API int yr_scanner_scan_file(YR_SCANNER* scanner, const char* filename)
 {
-  YR_MAPPED_FILE mfile;
-
-  int result = yr_filemap_map(filename, &mfile);
-
-  if (result == ERROR_SUCCESS)
+  // Checks if global hyperscan variable is set (defined by whether or not Hyperscan is configured)/
+  if (HYPERSCAN)
   {
-    result = yr_scanner_scan_mem(scanner, mfile.data, mfile.size);
-    yr_filemap_unmap(&mfile);
-  }
+      YR_RULE* tempRule;
+      YR_STRING* tempString;
+      YR_META* tempMeta;
+        
+        // Steps through every rule and calls Hyperscan scanning accordingly based on type of string.
 
-  return result;
+        yr_rules_foreach(scanner->rules, tempRule)
+        {
+          yr_rule_strings_foreach(tempRule, tempString)
+          {
+            if (STRING_IS_LITERAL(tempString))
+            {
+              hs_mpm(tempString->string, filename, scanner, tempRule);
+            }
+            else if STRING_IS_REGEXP(tempString)
+            {
+              hs_mpm(yr_get_re_string(0), filename, scanner, tempRule);
+             }
+            else if STRING_IS_HEX(tempString)
+            {
+              // Functionality not ready yet
+            }
+          }
+        }
+      
+
+      scanner->callback(scanner, CALLBACK_MSG_SCAN_FINISHED, NULL, scanner->user_data);
+
+      // Error checking not implemented yet.
+      return ERROR_SUCCESS;
+  }
+  else
+  {
+    YR_MAPPED_FILE mfile;
+
+    int result = yr_filemap_map(filename, &mfile);
+
+    if (result == ERROR_SUCCESS)
+      {
+        result = yr_scanner_scan_mem(scanner, mfile.data, mfile.size);
+        yr_filemap_unmap(&mfile);
+      }
+
+    return result;
+  }
 }
 
 YR_API int yr_scanner_scan_fd(YR_SCANNER* scanner, YR_FILE_DESCRIPTOR fd)

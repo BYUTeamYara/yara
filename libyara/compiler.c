@@ -266,7 +266,8 @@ YR_API int yr_compiler_create(YR_COMPILER** compiler)
 
   if (result == ERROR_SUCCESS)
     result = yr_ac_automaton_create(
-        new_compiler->arena, &new_compiler->automaton);
+        new_compiler->arena,
+        &new_compiler->automaton);
 
   if (result == ERROR_SUCCESS)
   {
@@ -671,8 +672,9 @@ static int _yr_compiler_compile_rules(YR_COMPILER* compiler)
       NULL));
 
   // Write Aho-Corasick automaton to arena.
-  FAIL_ON_ERROR(yr_ac_compile(compiler->automaton, compiler->arena));
-
+  FAIL_ON_ERROR(yr_ac_compile(
+      compiler->automaton,
+      compiler->arena));
   YR_ARENA_REF ref;
 
   FAIL_ON_ERROR(yr_arena_allocate_struct(

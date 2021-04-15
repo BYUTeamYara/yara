@@ -60,6 +60,9 @@ order to avoid confusion with operating system threads.
 
 typedef uint8_t RE_SPLIT_ID_TYPE;
 
+int numString = 0;
+char reString[30][30];
+
 typedef struct _RE_REPEAT_ARGS
 {
   uint16_t min;
@@ -199,12 +202,29 @@ void yr_re_ast_destroy(RE_AST* re_ast)
   yr_free(re_ast);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Two temporary functions for global variables to implement regex in proof of concept manner.
+//
+
+char* yr_get_re_string(int index)
+{
+  return reString[index];
+}
+
+void yr_add_string(const char* string)
+{
+  strncpy(reString[numString], string, strlen(string));
+  numString=numString+1;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Parses a regexp but don't emit its code. A further call to
 // yr_re_ast_emit_code is required to get the code.
 //
 int yr_re_parse(const char* re_string, RE_AST** re_ast, RE_ERROR* error)
 {
+  yr_add_string(re_string);
   return yr_parse_re_string(re_string, re_ast, error);
 }
 
@@ -214,6 +234,7 @@ int yr_re_parse(const char* re_string, RE_AST** re_ast, RE_ERROR* error)
 //
 int yr_re_parse_hex(const char* hex_string, RE_AST** re_ast, RE_ERROR* error)
 {
+  yr_add_string(hex_string);
   return yr_parse_hex_string(hex_string, re_ast, error);
 }
 

@@ -273,7 +273,7 @@ static void _yr_scan_update_match_chain_length(
   }
 }
 
-static int _yr_scan_add_match_to_list(
+int _yr_scan_add_match_to_list(
     YR_MATCH* match,
     YR_MATCHES* matches_list,
     int replace_if_exists)

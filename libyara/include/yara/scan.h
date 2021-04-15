@@ -49,4 +49,9 @@ int yr_scan_verify_match(
     uint64_t data_base,
     size_t offset);
 
+int _yr_scan_add_match_to_list(
+    YR_MATCH* match,
+    YR_MATCHES* matches_list,
+    int replace_if_exists);
+
 #endif

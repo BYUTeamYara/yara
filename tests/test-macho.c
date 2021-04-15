@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   YR_DEBUG_INITIALIZE();
   YR_DEBUG_FPRINTF(1, stderr, "+ %s() { // in %s\n", __FUNCTION__, argv[0]);
 
-  chdir_if_env_top_srcdir();
+  init_top_srcdir();
 
   yr_initialize();
 
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 
   assert_true_rule_blob(
       "import \"macho\" rule test { condition: \
-    macho.flags == 0x000002000 }",
+    macho.flags == 0x0000100085 }",
       MACHO_X86_64_DYLIB_FILE);
 
   assert_true_rule_blob(
